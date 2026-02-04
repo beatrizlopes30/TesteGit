@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Restaurante</title>
+    <style>
+        :root {
+            --primary-color: #d8802e;
+            --secondary-color: #4ecdc4;
+            --dark-color: #292f36;
+            --light-color: #f7fff7;
+            --accent-color: #ffd166;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 0 5px 5px 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .card .price {
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-top: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ff5252;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #3dbeb6;
+        }
+        
+        .btn-danger {
+            background-color: #ff5252;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff0000;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .mesas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .mesa {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mesa:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mesa.livre {
+            background-color: #e8f5e9;
+            border: 2px solid #81c784;
+        }
+        
+        .mesa.ocupada {
+            background-color: #ffebee;
+            border: 2px solid #e57373;
+        }
+        
+        .mesa h3 {
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+        
+        .mesa p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .pedido-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .pedido-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            text-align: right;
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-livre {
+            background-color: #81c784;
+        }
+        
+        .status-ocupada {
+            background-color: #e57373;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .mesas-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NOSSO PONTO</h1>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="mesas">Mesas</div>
+            <div class="tab" data-tab="cardapio">Cardápio</div>
+            <div class="tab" data-tab="estoque">Estoque</div>
+            <div class="tab" data-tab="relatorios">Relatórios</div>
+        </div>
+        
+        <!-- Tab Mesas -->
+        <div class="tab-content active" id="mesas">
+            <h2>Mesas</h2>
+            <div class="mesas-container" id="mesas-container">
+                <!-- Mesas serão carregadas dinamicamente aqui -->
+            </div>
+            
+            <button class="btn btn-primary" id="btn-nova-mesa">Adicionar Mesa</button>
+        </div>
+        
+        <!-- Tab Cardápio -->
+        <div class="tab-content" id="cardapio">
+            <h2>Cardápio</h2>
+            <div class="search-bar">
+                <input type="text" id="search-cardapio" placeholder="Buscar item no cardápio...">
+            </div>
+            <div class="grid" id="cardapio-grid">
+                <!-- Itens do cardápio serão carregados dinamicamente aqui -->
+            </div>
+            
+            <button class="btn btn-primary" id="btn-novo-item">Adicionar Item</button>
+        </div>
+        
+        <!-- Tab Estoque -->
+        <div class="tab-content" id="estoque">
+            <h2>Estoque</h2>
+            <table id="estoque-table">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Preço Unitário</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Itens de estoque serão carregados dinamicamente aqui -->
+                </tbody>
+            </table>
+            
+            <button class="btn btn-primary" id="btn-novo-produto">Adicionar Produto</button>
+        </div>
+        
+        <!-- Tab Relatórios -->
+        <div class="tab-content" id="relatorios">
+            <h2>Relatórios</h2>
+            <div class="form-group">
+                <label for="relatorio-data">Selecione o período:</label>
+                <input type="date" id="relatorio-data-inicio">
+                <input type="date" id="relatorio-data-fim">
+                <button class="btn btn-primary" id="btn-gerar-relatorio">Gerar Relatório</button>
+            </div>
+            
+            <div id="relatorio-resultado">
+                <!-- Resultados do relatório serão exibidos aqui -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Mesa -->
+    <div class="modal" id="modal-mesa">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-mesa-title">Nova Mesa</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modal-mesa-content">
+                <div class="form-group">
+                    <label for="mesa-numero">Número da Mesa:</label>
+                    <input type="text" id="mesa-numero">
+                </div>
+                <div class="form-group">
+                    <label for="mesa-capacidade">Capacidade:</label>
+                    <input type="number" id="mesa-capacidade">
+                </div>
+                <button class="btn btn-primary" id="btn-salvar-mesa">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Pedido -->
+    <div class="modal" id="modal-pedido">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-pedido-title">Pedido - Mesa <span id="mesa-numero-pedido"></span></h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modal-pedido-content">
+                <div class="form-group">
+                    <label for="pedido-cliente">Nome do Cliente:</label>
+                    <input type="text" id="pedido-cliente">
+                </div>
+                
+                <h3>Adicionar Itens</h3>
+                <div class="form-group">
+                    <label for="pedido-item">Item:</label>
+                    <select id="pedido-item">
+                        <!-- Itens do cardápio serão carregados aqui -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pedido-quantidade">Quantidade:</label>
+                    <input type="number" id="pedido-quantidade" value="1" min="1">
+                </div>
+                <button class="btn btn-secondary" id="btn-adicionar-item">Adicionar</button>
+                
+                <h3 style="margin-top: 20px;">Itens do Pedido</h3>
+                <div id="pedido-itens">
+                    <!-- Itens do pedido serão exibidos aqui -->
+                </div>
+                
+                <div class="pedido-total">
+                    Total: R$ <span id="pedido-total">0,00</span>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="btn-finalizar-pedido">Finalizar Pedido</button>
+                    <button class="btn btn-danger" id="btn-cancelar-pedido">Cancelar Pedido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Item Cardápio -->
+    <div class="modal" id="modal-item">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-item-title">Novo Item</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modal-item-content">
+                <div class="form-group">
+                    <label for="item-nome">Nome:</label>
+                    <input type="text" id="item-nome">
+                </div>
+                <div class="form-group">
+                    <label for="item-descricao">Descrição:</label>
+                    <input type="text" id="item-descricao">
+                </div>
+                <div class="form-group">
+                    <label for="item-categoria">Categoria:</label>
+                    <select id="item-categoria">
+                        <option value="hamburguer">Hambúrguer</option>
+                        <option value="pastel">Pastel</option>
+                        <option value="porcao">Porção</option>
+                        <option value="bebida">Bebida</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="item-preco">Preço:</label>
+                    <input type="number" id="item-preco" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="item-ingredientes">Ingredientes (separados por vírgula):</label>
+                    <input type="text" id="item-ingredientes">
+                </div>
+                <button class="btn btn-primary" id="btn-salvar-item">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Produto Estoque -->
+    <div class="modal" id="modal-produto">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-produto-title">Novo Produto</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modal-produto-content">
+                <div class="form-group">
+                    <label for="produto-nome">Nome:</label>
+                    <input type="text" id="produto-nome">
+                </div>
+                <div class="form-group">
+                    <label for="produto-quantidade">Quantidade:</label>
+                    <input type="number" id="produto-quantidade">
+                </div>
+                <div class="form-group">
+                    <label for="produto-preco">Preço Unitário:</label>
+                    <input type="number" id="produto-preco" step="0.01">
+                </div>
+                <div class="form-group">
+                </div>
+                <button class="btn btn-primary" id="btn-salvar-produto">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variáveis globais
+        let mesas = [];
+        let cardapio = [];
+        let estoque = [];
+        let pedidoAtual = {
+            mesaId: null,
+            cliente: '',
+            itens: [],
+            total: 0
+        };
+        
+        // Elementos do DOM
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabs = document.querySelectorAll('.tab');
+        const mesasContainer = document.getElementById('mesas-container');
+        const cardapioGrid = document.getElementById('cardapio-grid');
+        const estoqueTable = document.querySelector('#estoque-table tbody');
+        
+        // Modais
+        const modalMesa = document.getElementById('modal-mesa');
+        const modalPedido = document.getElementById('modal-pedido');
+        const modalItem = document.getElementById('modal-item');
+        const modalProduto = document.getElementById('modal-produto');
+        
+        // Botões
+        const btnNovaMesa = document.getElementById('btn-nova-mesa');
+        const btnNovoItem = document.getElementById('btn-novo-item');
+        const btnNovoProduto = document.getElementById('btn-novo-produto');
+        
+        // Funções de inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carregar dados iniciais
+            carregarDadosIniciais();
+            
+            // Configurar tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    abrirTab(tabId);
+                });
+            });
+            
+            // Configurar modais
+            const closeButtons = document.querySelectorAll('.close-btn');
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modal = btn.closest('.modal');
+                    modal.style.display = 'none';
+                });
+            });
+            
+            // Botão nova mesa
+            btnNovaMesa.addEventListener('click', () => {
+                abrirModalMesa();
+            });
+            
+            // Botão novo item
+            btnNovoItem.addEventListener('click', () => {
+                abrirModalItem();
+            });
+            
+            // Botão novo produto
+            btnNovoProduto.addEventListener('click', () => {
+                abrirModalProduto();
+            });
+            
+            // Fechar modais ao clicar fora
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+        });
+        
+        // Função para carregar dados iniciais (simulando API)
+        function carregarDadosIniciais() {
+            // Mesas de exemplo
+            mesas = [
+                { id: 1, numero: '1', capacidade: 4, status: 'livre' },
+                { id: 2, numero: '2', capacidade: 6, status: 'livre' },
+                { id: 3, numero: '3', capacidade: 2, status: 'livre' },
+                { id: 4, numero: '4', capacidade: 8, status: 'livre' }
+            ];
+            
+            // Cardápio de exemplo (baseado nas imagens fornecidas)
+            cardapio = [
+                { 
+                    id: 1, 
+                    nome: 'X-TUDO', 
+                    descricao: 'Pão, Hambúrguer, Tomate, Alface, Queijo Mussarela, Presunto, Bacon, Salsicha, Ovo, Milho e Batata Palha.', 
+                    categoria: 'hamburguer', 
+                    preco: 15.00,
+                    ingredientes: ['Pão', 'Hambúrguer', 'Tomate', 'Alface', 'Queijo Mussarela', 'Presunto', 'Bacon', 'Salsicha', 'Ovo', 'Milho', 'Batata Palha'],
+                    estoqueNecessario: [
+                        { produtoId: 1, quantidade: 1 }, // Pão
+                        { produtoId: 2, quantidade: 1 }, // Hambúrguer
+                        // ... outros ingredientes
+                    ]
+                },
+                { 
+                    id: 2, 
+                    nome: 'X-SALADA', 
+                    descricao: 'Pão, Hambúrguer, Tomate, Alface, Queijo Mussarela, Ovo, Milho e Batata Palha.', 
+                    categoria: 'hamburguer', 
+                    preco: 10.00,
+                    ingredientes: ['Pão', 'Hambúrguer', 'Tomate', 'Alface', 'Queijo Mussarela', 'Ovo', 'Milho', 'Batata Palha']
+                },
+                { 
+                    id: 3, 
+                    nome: 'X-CALABRESA', 
+                    descricao: 'Pão, Hambúrguer, Tomate, Alface, Queijo Mussarela, Presunto, Bacon, Calabresa, Salsicha, Ovo, Milho e Batata Palha.', 
+                    categoria: 'hamburguer', 
+                    preco: 15.00,
+                    ingredientes: ['Pão', 'Hambúrguer', 'Tomate', 'Alface', 'Queijo Mussarela', 'Presunto', 'Bacon', 'Calabresa', 'Salsicha', 'Ovo', 'Milho', 'Batata Palha']
+                },
+                { 
+                    id: 4, 
+                    nome: 'Batata P - Simples', 
+                    descricao: 'Porção de batata frita pequena simples.', 
+                    categoria: 'porcao', 
+                    preco: 10.00,
+                    ingredientes: ['Batata', 'Óleo', 'Sal']
+                },
+                { 
+                    id: 5, 
+                    nome: 'Batata G - Simples', 
+                    descricao: 'Porção de batata frita grande simples.', 
+                    categoria: 'porcao', 
+                    preco: 12.00,
+                    ingredientes: ['Batata', 'Óleo', 'Sal']
+                },
+                { 
+                    id: 6, 
+                    nome: 'Pastel de Carne', 
+                    descricao: 'Pastel simples de carne moída.', 
+                    categoria: 'pastel', 
+                    preco: 7.00,
+                    ingredientes: ['Massa de pastel', 'Carne moída', 'Temperos']
+                }
+            ];
+            
+            // Estoque de exemplo
+            estoque = [
+                { id: 1, nome: 'Pão de hambúrguer', quantidade: 100, preco: 0.50, unidade: 'un' },
+                { id: 2, nome: 'Hambúrguer', quantidade: 50, preco: 2.00, unidade: 'un' },
+                { id: 3, nome: 'Queijo Mussarela', quantidade: 5, preco: 25.00, unidade: 'kg' },
+                { id: 4, nome: 'Batata', quantidade: 20, preco: 3.50, unidade: 'kg' },
+                { id: 5, nome: 'Óleo', quantidade: 10, preco: 8.00, unidade: 'l' }
+            ];
+            
+            // Atualizar interfaces
+            atualizarMesas();
+            atualizarCardapio();
+            atualizarEstoque();
+        }
+        
+        // Função para abrir uma tab
+        function abrirTab(tabId) {
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+        }
+        
+        // Funções para mesas
+        function atualizarMesas() {
+            mesasContainer.innerHTML = '';
+            
+            mesas.forEach(mesa => {
+                const mesaElement = document.createElement('div');
+                mesaElement.className = `mesa ${mesa.status}`;
+                mesaElement.innerHTML = `
+                    <h3>Mesa ${mesa.numero}</h3>
+                    <p>Capacidade: ${mesa.capacidade} pessoas</p>
+                    <p><span class="status-indicator status-${mesa.status}"></span>${mesa.status === 'livre' ? 'Livre' : 'Ocupada'}</p>
+                `;
+                
+                mesaElement.addEventListener('click', () => {
+                    if (mesa.status === 'livre') {
+                        abrirModalPedido(mesa);
+                    } else {
+                        // Ver detalhes do pedido existente
+                        alert(`Mesa ${mesa.numero} está ocupada. Ver detalhes do pedido.`);
+                    }
+                });
+                
+                mesasContainer.appendChild(mesaElement);
+            });
+        }
+        
+        function abrirModalMesa(mesa = null) {
+            const title = document.getElementById('modal-mesa-title');
+            const numeroInput = document.getElementById('mesa-numero');
+            const capacidadeInput = document.getElementById('mesa-capacidade');
+            const btnSalvar = document.getElementById('btn-salvar-mesa');
+            
+            if (mesa) {
+                // Editar mesa existente
+                title.textContent = `Editar Mesa ${mesa.numero}`;
+                numeroInput.value = mesa.numero;
+                capacidadeInput.value = mesa.capacidade;
+                
+                btnSalvar.onclick = () => {
+                    mesa.numero = numeroInput.value;
+                    mesa.capacidade = capacidadeInput.value;
+                    atualizarMesas();
+                    modalMesa.style.display = 'none';
+                };
+            } else {
+                // Nova mesa
+                title.textContent = 'Nova Mesa';
+                numeroInput.value = '';
+                capacidadeInput.value = '';
+                
+                btnSalvar.onclick = () => {
+                    const novaMesa = {
+                        id: mesas.length > 0 ? Math.max(...mesas.map(m => m.id)) + 1 : 1,
+                        numero: numeroInput.value,
+                        capacidade: capacidadeInput.value,
+                        status: 'livre'
+                    };
+                    
+                    mesas.push(novaMesa);
+                    atualizarMesas();
+                    modalMesa.style.display = 'none';
+                };
+            }
+            
+            modalMesa.style.display = 'flex';
+        }
+        
+        // Funções para pedidos
+        function abrirModalPedido(mesa) {
+            pedidoAtual = {
+                mesaId: mesa.id,
+                cliente: '',
+                itens: [],
+                total: 0
+            };
+            
+            document.getElementById('mesa-numero-pedido').textContent = mesa.numero;
+            document.getElementById('pedido-cliente').value = '';
+            document.getElementById('pedido-quantidade').value = '1';
+            document.getElementById('pedido-itens').innerHTML = '';
+            document.getElementById('pedido-total').textContent = '0,00';
+            
+            // Preencher select de itens
+            const selectItem = document.getElementById('pedido-item');
+            selectItem.innerHTML = '';
+            
+            cardapio.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
+                selectItem.appendChild(option);
+            });
+            
+            // Configurar botões
+            document.getElementById('btn-adicionar-item').onclick = () => {
+                const itemId = parseInt(selectItem.value);
+                const quantidade = parseInt(document.getElementById('pedido-quantidade').value);
+                const item = cardapio.find(i => i.id === itemId);
+                
+                if (item) {
+                    // Verificar estoque
+                    if (verificarEstoque(item, quantidade)) {
+                        // Adicionar ao pedido
+                        const itemPedido = {
+                            id: item.id,
+                            nome: item.nome,
+                            preco: item.preco,
+                            quantidade: quantidade
+                        };
+                        
+                        // Verificar se item já existe no pedido
+                        const itemExistente = pedidoAtual.itens.find(i => i.id === item.id);
+                        if (itemExistente) {
+                            itemExistente.quantidade += quantidade;
+                        } else {
+                            pedidoAtual.itens.push(itemPedido);
+                        }
+                        
+                        // Atualizar total
+                        pedidoAtual.total += item.preco * quantidade;
+                        document.getElementById('pedido-total').textContent = pedidoAtual.total.toFixed(2);
+                        
+                        // Atualizar lista de itens
+                        atualizarItensPedido();
+                    } else {
+                        alert('Estoque insuficiente para este item!');
+                    }
+                }
+            };
+            
+            document.getElementById('btn-finalizar-pedido').onclick = () => {
+                pedidoAtual.cliente = document.getElementById('pedido-cliente').value;
+                
+                // Atualizar status da mesa
+                const mesaIndex = mesas.findIndex(m => m.id === pedidoAtual.mesaId);
+                if (mesaIndex !== -1) {
+                    mesas[mesaIndex].status = 'ocupada';
+                }
+                
+                // Baixar estoque
+                baixarEstoquePedido();
+                
+                // Salvar pedido (simulação)
+                alert(`Pedido da Mesa ${mesa.numero} finalizado com sucesso! Total: R$ ${pedidoAtual.total.toFixed(2)}`);
+                
+                // Atualizar interfaces
+                atualizarMesas();
+                atualizarEstoque();
+                
+                // Fechar modal
+                modalPedido.style.display = 'none';
+            };
+            
+            document.getElementById('btn-cancelar-pedido').onclick = () => {
+                modalPedido.style.display = 'none';
+            };
+            
+            modalPedido.style.display = 'flex';
+        }
+        
+        function atualizarItensPedido() {
+            const itensContainer = document.getElementById('pedido-itens');
+            itensContainer.innerHTML = '';
+            
+            pedidoAtual.itens.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'pedido-item';
+                itemElement.innerHTML = `
+                    <div>
+                        <strong>${item.nome}</strong>
+                        <p>${item.quantidade} x R$ ${item.preco.toFixed(2)}</p>
+                    </div>
+                    <div>
+                        R$ ${(item.quantidade * item.preco).toFixed(2)}
+                    </div>
+                `;
+                
+                itensContainer.appendChild(itemElement);
+            });
+        }
+        
+        function verificarEstoque(item, quantidade) {
+            // Simulação: verificar se há estoque suficiente para todos os ingredientes
+            // Na implementação real, isso seria mais detalhado
+            return true; // Temporário - sempre retorna true para fins de demonstração
+        }
+        
+        function baixarEstoquePedido() {
+            // Simulação: baixar estoque dos itens do pedido
+            // Na implementação real, isso seria mais detalhado
+            console.log('Estoque baixado para o pedido:', pedidoAtual);
+        }
+        
+        // Funções para cardápio
+        function atualizarCardapio() {
+            cardapioGrid.innerHTML = '';
+            
+            cardapio.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'card';
+                itemElement.innerHTML = `
+                    <h3>${item.nome}</h3>
+                    <p>${item.descricao}</p>
+                    <p class="price">R$ ${item.preco.toFixed(2)}</p>
+                `;
+                
+                cardapioGrid.appendChild(itemElement);
+            });
+        }
+        
+        function abrirModalItem(item = null) {
+            const title = document.getElementById('modal-item-title');
+            const nomeInput = document.getElementById('item-nome');
+            const descricaoInput = document.getElementById('item-descricao');
+            const categoriaInput = document.getElementById('item-categoria');
+            const precoInput = document.getElementById('item-preco');
+            const ingredientesInput = document.getElementById('item-ingredientes');
+            const btnSalvar = document.getElementById('btn-salvar-item');
+            
+            if (item) {
+                // Editar item existente
+                title.textContent = `Editar ${item.nome}`;
+                nomeInput.value = item.nome;
+                descricaoInput.value = item.descricao;
+                categoriaInput.value = item.categoria;
+                precoInput.value = item.preco;
+                ingredientesInput.value = item.ingredientes.join(', ');
+                
+                btnSalvar.onclick = () => {
+                    item.nome = nomeInput.value;
+                    item.descricao = descricaoInput.value;
+                    item.categoria = categoriaInput.value;
+                    item.preco = parseFloat(precoInput.value);
+                    item.ingredientes = ingredientesInput.value.split(',').map(i => i.trim());
+                    
+                    atualizarCardapio();
+                    modalItem.style.display = 'none';
+                };
+            } else {
+                // Novo item
+                title.textContent = 'Novo Item';
+                nomeInput.value = '';
+                descricaoInput.value = '';
+                categoriaInput.value = 'hamburguer';
+                precoInput.value = '';
+                ingredientesInput.value = '';
+                
+                btnSalvar.onclick = () => {
+                    const novoItem = {
+                        id: cardapio.length > 0 ? Math.max(...cardapio.map(i => i.id)) + 1 : 1,
+                        nome: nomeInput.value,
+                        descricao: descricaoInput.value,
+                        categoria: categoriaInput.value,
+                        preco: parseFloat(precoInput.value),
+                        ingredientes: ingredientesInput.value.split(',').map(i => i.trim())
+                    };
+                    
+                    cardapio.push(novoItem);
+                    atualizarCardapio();
+                    modalItem.style.display = 'none';
+                };
+            }
+            
+            modalItem.style.display = 'flex';
+        }
+        
+        // Funções para estoque
+        function atualizarEstoque() {
+            estoqueTable.innerHTML = '';
+            
+            estoque.forEach(produto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${produto.nome}</td>
+                    <td>${produto.quantidade} ${getUnidadeTexto(produto.unidade)}</td>
+                    <td>R$ ${produto.preco.toFixed(2)}</td>
+                    <td>R$ ${(produto.quantidade * produto.preco).toFixed(2)}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-secondary btn-editar-produto">Editar</button>
+                        <button class="btn btn-danger btn-excluir-produto">Excluir</button>
+                    </td>
+                `;
+                
+                // Configurar botão editar
+                row.querySelector('.btn-editar-produto').addEventListener('click', () => {
+                    abrirModalProduto(produto);
+                });
+                
+                // Configurar botão excluir
+                row.querySelector('.btn-excluir-produto').addEventListener('click', () => {
+                    if (confirm(`Tem certeza que deseja excluir ${produto.nome}?`)) {
+                        estoque = estoque.filter(p => p.id !== produto.id);
+                        atualizarEstoque();
+                    }
+                });
+                
+                estoqueTable.appendChild(row);
+            });
+        }
+        
+        function abrirModalProduto(produto = null) {
+            const title = document.getElementById('modal-produto-title');
+            const nomeInput = document.getElementById('produto-nome');
+            const quantidadeInput = document.getElementById('produto-quantidade');
+            const precoInput = document.getElementById('produto-preco');
+            const unidadeInput = document.getElementById('produto-unidade');
+            const btnSalvar = document.getElementById('btn-salvar-produto');
+            
+            if (produto) {
+                // Editar produto existente
+                title.textContent = `Editar ${produto.nome}`;
+                nomeInput.value = produto.nome;
+                quantidadeInput.value = produto.quantidade;
+                precoInput.value = produto.preco;
+                unidadeInput.value = produto.unidade;
+                
+                btnSalvar.onclick = () => {
+                    produto.nome = nomeInput.value;
+                    produto.quantidade = parseInt(quantidadeInput.value);
+                    produto.preco = parseFloat(precoInput.value);
+                    produto.unidade = unidadeInput.value;
+                    
+                    atualizarEstoque();
+                    modalProduto.style.display = 'none';
+                };
+            } else {
+                // Novo produto
+                title.textContent = 'Novo Produto';
+                nomeInput.value = '';
+                quantidadeInput.value = '';
+                precoInput.value = '';
+                unidadeInput.value = 'un';
+                
+                btnSalvar.onclick = () => {
+                    const novoProduto = {
+                        id: estoque.length > 0 ? Math.max(...estoque.map(p => p.id)) + 1 : 1,
+                        nome: nomeInput.value,
+                        quantidade: parseInt(quantidadeInput.value),
+                        preco: parseFloat(precoInput.value),
+                        unidade: unidadeInput.value
+                    };
+                    
+                    estoque.push(novoProduto);
+                    atualizarEstoque();
+                    modalProduto.style.display = 'none';
+                };
+            }
+            
+            modalProduto.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
